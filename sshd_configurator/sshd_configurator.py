@@ -84,6 +84,7 @@ def sshd_configurator(interface, sshd_config):
             try:
                 result = [s for s in fhr if interface in s][-1]
             except IndexError:
+                print("here")
                 warn_confd_sshd_configurator_interface(interface)
             else:
                 if not result.startswith("SSHD_INTERFACE="):
