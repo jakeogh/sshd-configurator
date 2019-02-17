@@ -62,9 +62,16 @@ def sshd_configurator(interface, sshd_config):
     listen_service = "net." + interface
     try:
         with open('/etc/conf.d/sshd-configurator', 'r') as fh:
-            fhr = filter(lambda row: row[0] != '#', fh)
-            if listen_service not in fhr:
+            fhr = filter(None, (line.strip() for line in fh))
+            fhr = filter(lambda row: row[0] != '#', fhr)
+            try:
+                result = [s for s in fhr if listen_service in s][-1]
+            except IndexError:
                 warn_confd_sshd_configurator(interface)
+            else:
+                if not result.startswith("rc_need="):
+                    warn_confd_sshd_configurator(interface)
+
     except FileNotFoundError:
         warn_confd_sshd_configurator(interface)
 
