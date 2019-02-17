@@ -24,8 +24,10 @@ class SSHD_CONFIGURATOR():
 @click.option('--daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator(interface, daemon, sshd_config):
+    foreground = not daemon
+    print("foreground:", foreground)
     sshd_configurator_obj = SSHD_CONFIGURATOR(interface=interface, daemon=daemon, sshd_config=sshd_config)
-    daemon = Daemonize(app="ssh_configurator", pid=pidfile, action=sshd_configurator_obj.run)
+    daemon = Daemonize(app="ssh_configurator", pid=pidfile, action=sshd_configurator_obj.run, foreground=foreground)
     daemon.start()
 
 
