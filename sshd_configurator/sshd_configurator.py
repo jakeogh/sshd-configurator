@@ -100,14 +100,14 @@ def sshd_configurator(interface, sshd_config):
 
     if os.geteuid() == 0:
         if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
-        command = "chattr +i " + sshd_config
-        os.system(command)
-        atexit.register(un_mute)
-        signal.signal(signal.SIGTERM, un_mute)
-        signal.signal(signal.SIGHUP, un_mute)
+            command = "chattr +i " + sshd_config
+            os.system(command)
+            atexit.register(un_mute)
+            signal.signal(signal.SIGTERM, un_mute)
+            signal.signal(signal.SIGHUP, un_mute)
 
-        while True:
-            sleep(1000000)
+            while True:
+                sleep(1000000)
 
 
 if __name__ == '__main__':
