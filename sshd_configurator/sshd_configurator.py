@@ -13,6 +13,7 @@ def sshd_configurator(interface, be_daemon, sshd_config):
         with daemon.DaemonContext():
             sshd_configurator_daemon(interface=interface, daemon=be_daemon, sshd_config=sshd_config)
     else:
+        print("starting with be_daemon:", be_deamon)
         sshd_configurator_daemon(interface=interface, daemon=be_daemon, sshd_config=sshd_config)
 
 
