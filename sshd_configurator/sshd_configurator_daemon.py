@@ -4,8 +4,8 @@ import os
 import sys
 #import logging
 import netifaces
-import atexit
-import signal
+#import atexit
+#import signal
 from time import sleep
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -13,6 +13,7 @@ from time import sleep
     Parse sshd_config and make sure sshd is configured to start on the
     interface specified in /etc/conf.d/sshd-configurator
 '''
+
 
 def write_unique_line_to_file(line, file_to_write):
     '''
@@ -41,18 +42,18 @@ def sshd_configurator_daemon(interface, daemon, sshd_config, logger):
         logger.error("ERROR: Run \"chattr -i " + sshd_config + "\"")
         quit(1)
 
-    def un_mute(*args):
-        command = "chattr -i " + sshd_config
-        os.system(command)
+    #def un_mute(*args):
+    #    command = "chattr -i " + sshd_config
+    #    os.system(command)
 
     if os.geteuid() == 0:
         #if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
         if daemon:
-            command = "chattr +i " + sshd_config
-            os.system(command)
-            atexit.register(un_mute)
-            signal.signal(signal.SIGTERM, un_mute)
-            signal.signal(signal.SIGHUP, un_mute)
+            #command = "chattr +i " + sshd_config
+            #os.system(command)
+            #atexit.register(un_mute)
+            #signal.signal(signal.SIGTERM, un_mute)
+            #signal.signal(signal.SIGHUP, un_mute)
 
             while True:
                 sleep(1000000)
