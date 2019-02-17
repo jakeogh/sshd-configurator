@@ -27,18 +27,21 @@ def write_unique_line_to_file(line, file_to_write):
 
 
 def warn_confd_sshd():
-    print("\nWARNING: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
-    print("WARNING: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+    print("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
+    print("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+    quit(1)
 
 
 def warn_confd_sshd_configurator(interface):
-    print("\nWARNING: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
-    print("WARNING: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    print("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
+    print("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    quit(1)
 
 
 def warn_confd_sshd_configurator_interface(interface):
-    print("\nWARNING: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
-    print("WARNING: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    print("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
+    print("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    quit(1)
 
 
 @click.command()
@@ -108,7 +111,6 @@ def sshd_configurator(interface, sshd_config):
     if os.geteuid() == 0:
         #if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
         if not sys.stdout.isatty():
-            print("not an interactve session")
             command = "chattr +i " + sshd_config
             os.system(command)
             atexit.register(un_mute)
@@ -117,6 +119,10 @@ def sshd_configurator(interface, sshd_config):
 
             while True:
                 sleep(1000000)
+        else:
+            print("sshd appears to be properly configured to use", interface, file=sys.stderr)
+            quit(0)
+
 
 
 if __name__ == '__main__':
