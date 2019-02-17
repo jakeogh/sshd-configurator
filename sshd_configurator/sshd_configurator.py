@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 
 import click
-#import logging
+import logging
 import attr
 from daemonize import Daemonize
 from .sshd_configurator_daemon import sshd_configurator_daemon
 
 global pidfile
 pidfile = "/run/sshd-configurator.pid"
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+fh = logging.StreamHandler()
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+global keep_fds
+keep_fds = [fh.stream.fileno()]
 
 
 @attr.s(auto_attribs=True)
@@ -26,10 +35,11 @@ class SSHD_CONFIGURATOR():
 @click.option('--daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator(interface, daemon, sshd_config):
+    global keep_fds
     foreground = not daemon
     print("foreground:", foreground)
     sshd_configurator_obj = SSHD_CONFIGURATOR(interface=interface, daemon=daemon, sshd_config=sshd_config)
-    daemon = Daemonize(app="ssh_configurator", pid=pidfile, action=sshd_configurator_obj.run, foreground=foreground)
+    daemon = Daemonize(app="ssh_configurator", pid=pidfile, action=sshd_configurator_obj.run, foreground=foreground, keep_fds=keep_fds)
     daemon.start()
 
 
