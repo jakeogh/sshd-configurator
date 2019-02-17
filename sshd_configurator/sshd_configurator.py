@@ -100,11 +100,12 @@ def sshd_configurator(interface, sshd_config):
 
     if os.geteuid() == 0:
         if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
+            print("not an interactve session")
             command = "chattr +i " + sshd_config
             os.system(command)
             atexit.register(un_mute)
-            signal.signal(signal.SIGTERM, un_mute)
-            signal.signal(signal.SIGHUP, un_mute)
+            signal.signal(signal.SIGTERM, un_mute, sshd_config)
+            signal.signal(signal.SIGHUP, un_mute, sshd_config)
 
             while True:
                 sleep(1000000)
