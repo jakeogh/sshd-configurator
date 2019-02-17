@@ -2,7 +2,7 @@
 
 import os
 import sys
-#import click
+import logging
 import netifaces
 import atexit
 import signal
@@ -27,27 +27,23 @@ def write_unique_line_to_file(line, file_to_write):
 
 
 def warn_confd_sshd():
-    print("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
-    print("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+    logging.error("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
+    logging.error("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
     quit(1)
 
 
 def warn_confd_sshd_configurator(interface):
-    print("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
-    print("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    logging.error("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
+    logging.error("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
     quit(1)
 
 
 def warn_confd_sshd_configurator_interface(interface):
-    print("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
-    print("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    logging.error("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
+    logging.error("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
     quit(1)
 
 
-#@click.command()
-#@click.argument('interface', nargs=1)
-#@click.option('--daemon', is_flag=True)
-#@click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator_daemon(interface, daemon, sshd_config):
     assert interface in netifaces.interfaces()
     assert os.path.getsize(sshd_config) != 0
@@ -102,8 +98,8 @@ def sshd_configurator_daemon(interface, daemon, sshd_config):
     try:
         write_unique_line_to_file(line=ssh_rule, file_to_write=sshd_config)
     except PermissionError:
-        print("ERROR: Unable to write to", sshd_config, file=sys.stderr)
-        print("ERROR: Run \"chattr -i " + sshd_config + "\"", file=sys.stderr)
+        logging.error("ERROR: Unable to write to", sshd_config, file=sys.stderr)
+        logging.error("ERROR: Run \"chattr -i " + sshd_config + "\"", file=sys.stderr)
         quit(1)
 
     def un_mute(*args):
