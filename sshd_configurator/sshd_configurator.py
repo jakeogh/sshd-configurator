@@ -6,7 +6,7 @@ from .sshd_configurator_daemon import sshd_configurator_daemon
 
 @click.command()
 @click.argument('interface', nargs=1)
-@click.option('--daemon', name='be_daemin', is_flag=True)
+@click.option('--daemon', 'be_daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator(interface, be_daemon, sshd_config):
     if daemon:
