@@ -7,7 +7,7 @@ import netifaces
 import atexit
 import signal
 from time import sleep
-from stat import UF_IMMUTABLE
+logging.basicConfig(level=logging.DEBUG)
 
 '''
     Parse sshd_config and make sure sshd is configured to start on the
