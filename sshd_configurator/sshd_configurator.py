@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-#import sys
 import click
 import logging
 import attr
@@ -100,7 +99,6 @@ def sshd_configurator(interface, daemon, sshd_config):
     keep_fds = [lfh.stream.fileno()]
 
     foreground = not daemon
-    print("foreground:", foreground)
     sshd_configurator_obj = SSHD_CONFIGURATOR(interface=interface, daemon=daemon, sshd_config=sshd_config, logger=log)
     daemon = Daemonize(app="ssh_configurator", pid=pidfile, action=sshd_configurator_obj.run, foreground=foreground, keep_fds=keep_fds)
     daemon.start()
