@@ -106,7 +106,8 @@ def sshd_configurator(interface, sshd_config):
         os.system(command)
 
     if os.geteuid() == 0:
-        if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
+        #if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
+        if not sys.stdout.isatty():
             print("not an interactve session")
             command = "chattr +i " + sshd_config
             os.system(command)
