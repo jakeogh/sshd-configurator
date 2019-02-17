@@ -76,7 +76,7 @@ def sshd_configurator(interface, daemon, sshd_config):
             fhr = filter(None, (line.strip() for line in fh))
             fhr = filter(lambda row: row[0] != '#', fhr)
             try:
-                result = [s for s in fhr if 'rc_need=' in s][-1]
+                result = [s for s in fhr if s.startswith('rc_need=')][-1]
             except IndexError:
                 warn_confd_sshd_configurator(interface)
             else:
@@ -90,7 +90,7 @@ def sshd_configurator(interface, daemon, sshd_config):
             fhr = filter(None, (line.strip() for line in fh))
             fhr = filter(lambda row: row[0] != '#', fhr)
             try:
-                result = [s for s in fhr if "SSHD_INTERFACE=" in s][-1]
+                result = [s for s in fhr if s.startswith("SSHD_INTERFACE=")][-1]
             except IndexError:
                 warn_confd_sshd_configurator_interface(interface)
             else:
