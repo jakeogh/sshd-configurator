@@ -86,6 +86,7 @@ def sshd_configurator(interface, sshd_config):
             except IndexError:
                 warn_confd_sshd_configurator_interface(interface)
             else:
+                print("result:", result)
                 if not result.startswith("SSHD_INTERFACE="):
                     print("here")
                     warn_confd_sshd_configurator_interface(interface)
