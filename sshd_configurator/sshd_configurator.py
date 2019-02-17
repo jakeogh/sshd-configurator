@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
+#import sys
 import click
 import logging
 import attr
@@ -9,20 +9,20 @@ from .sshd_configurator_daemon import sshd_configurator_daemon
 
 
 def warn_confd_sshd(logger):
-    logger.error("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
-    logger.error("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+    logger.error("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator")
+    logger.error("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd")
     quit(1)
 
 
 def warn_confd_sshd_configurator(logger, interface):
-    logger.error("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
-    logger.error("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    logger.error("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface)
+    logger.error("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator")
     quit(1)
 
 
 def warn_confd_sshd_configurator_interface(logger, interface):
-    logger.error("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
-    logger.error("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+    logger.error("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.")
+    logger.error("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator")
     quit(1)
 
 
@@ -97,7 +97,7 @@ def sshd_configurator(interface, daemon, sshd_config):
     #logger.propagate = False
     lfh = logging.StreamHandler()
     lfh.setLevel(logging.DEBUG)
-    log.addHandler(fh)
+    log.addHandler(lfh)
     keep_fds = [lfh.stream.fileno()]
 
     foreground = not daemon
