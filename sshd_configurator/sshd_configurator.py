@@ -32,6 +32,11 @@ def warn_confd_sshd_configurator(interface):
     print("WARNING: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
 
 
+def warn_confd_sshd_configurator_interface(interface):
+    print("\nWARNING: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
+    print("WARNING: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+
+
 @click.command()
 @click.argument('interface', nargs=1)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
@@ -54,8 +59,6 @@ def sshd_configurator(interface, sshd_config):
             else:
                 if not result.startswith("rc_need="):
                     warn_confd_sshd()
-
-            #import IPython; IPython.embed()
     except FileNotFoundError:
         warn_confd_sshd()
 
@@ -71,10 +74,22 @@ def sshd_configurator(interface, sshd_config):
             else:
                 if not result.startswith("rc_need="):
                     warn_confd_sshd_configurator(interface)
-
     except FileNotFoundError:
         warn_confd_sshd_configurator(interface)
 
+    try:
+        with open('/etc/conf.d/sshd-configurator', 'r') as fh:
+            fhr = filter(None, (line.strip() for line in fh))
+            fhr = filter(lambda row: row[0] != '#', fhr)
+            try:
+                result = [s for s in fhr if interface in s][-1]
+            except IndexError:
+                warn_confd_sshd_configurator_interface(interface)
+            else:
+                if not result.startswith("SSHD_INTERFACE="):
+                    warn_confd_sshd_configurator_interface(interface)
+    except FileNotFoundError:
+        warn_confd_sshd_configurator_interface(interface)
 
 if __name__ == '__main__':
     sshd_configurator()
