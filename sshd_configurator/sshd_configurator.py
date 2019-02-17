@@ -6,19 +6,6 @@ import attr
 from daemonize import Daemonize
 from .sshd_configurator_daemon import sshd_configurator_daemon
 
-global pidfile
-pidfile = "/run/sshd-configurator.pid"
-
-global logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-logger.propagate = False
-fh = logging.StreamHandler()
-fh.setLevel(logging.DEBUG)
-logger.addHandler(fh)
-global keep_fds
-keep_fds = [fh.stream.fileno()]
-
 
 @attr.s(auto_attribs=True)
 class SSHD_CONFIGURATOR():
@@ -29,6 +16,7 @@ class SSHD_CONFIGURATOR():
 
     def run(self):
         print("run")
+        print("self.logger:", self.logger)
         sshd_configurator_daemon(interface=self.interface, daemon=self.daemon, sshd_config=self.sshd_config, logger=self.logger)
 
 
@@ -37,9 +25,15 @@ class SSHD_CONFIGURATOR():
 @click.option('--daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator(interface, daemon, sshd_config):
-    global keep_fds
-    global pidfile
-    global logger
+    pidfile = "/run/sshd-configurator.pid"
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    logger.propagate = False
+    fh = logging.StreamHandler()
+    fh.setLevel(logging.DEBUG)
+    logger.addHandler(fh)
+    keep_fds = [fh.stream.fileno()]
+
     foreground = not daemon
     print("foreground:", foreground)
     sshd_configurator_obj = SSHD_CONFIGURATOR(interface=interface, daemon=daemon, sshd_config=sshd_config, logger=logger)
