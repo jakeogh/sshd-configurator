@@ -46,8 +46,9 @@ def warn_confd_sshd_configurator_interface(interface):
 
 @click.command()
 @click.argument('interface', nargs=1)
+@click.option('--daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
-def sshd_configurator(interface, sshd_config):
+def sshd_configurator(interface, daemon, sshd_config):
     assert interface in netifaces.interfaces()
     assert os.path.getsize(sshd_config) != 0
     listen_address = netifaces.ifaddresses(interface)[2][0]['addr']
@@ -110,7 +111,7 @@ def sshd_configurator(interface, sshd_config):
 
     if os.geteuid() == 0:
         #if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
-        if not sys.stdout.isatty():
+        if daemon:
             command = "chattr +i " + sshd_config
             os.system(command)
             atexit.register(un_mute)
