@@ -46,11 +46,16 @@ def sshd_configurator(interface, sshd_config):
     try:
         with open('/etc/conf.d/sshd', 'r') as fh:
             fhr = filter(None, (line.rstrip() for line in fh))
-            #fhr = filter(lambda row.strip(), fh)
             fhr = filter(lambda row: row[0] != '#', fhr)
-            import IPython; IPython.embed()
-            if 'sshd-configurator' not in fhr:
+            try:
+                result = [s for s in fhr if "sshd-configurator" in s][-1]
+            except IndexError:
                 warn_confd_sshd()
+            else:
+                if not result.startswith("rc_need="):
+                    warn_confd_sshd()
+
+            #import IPython; IPython.embed()
     except FileNotFoundError:
         warn_confd_sshd()
 
