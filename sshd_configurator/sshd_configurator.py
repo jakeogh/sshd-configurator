@@ -67,11 +67,11 @@ def sshd_configurator(interface, daemon, sshd_config):
             fhr = filter(None, (line.strip() for line in fh))
             fhr = filter(lambda row: row[0] != '#', fhr)
             try:
-                result = [s for s in fhr if "sshd-configurator" in s][-1]
+                result = [s for s in fhr if s.startswith('rc_need=')][-1]
             except IndexError:
                 warn_confd_sshd()
             else:
-                if not result.startswith("rc_need="):
+                if 'ssh-configurator' not in result:
                     warn_confd_sshd()
     except FileNotFoundError:
         warn_confd_sshd()
@@ -86,7 +86,7 @@ def sshd_configurator(interface, daemon, sshd_config):
             except IndexError:
                 warn_confd_sshd_configurator(interface)
             else:
-                if not listen_service in result:
+                if listen_service not in result:
                     warn_confd_sshd_configurator(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator(interface)
@@ -100,7 +100,7 @@ def sshd_configurator(interface, daemon, sshd_config):
             except IndexError:
                 warn_confd_sshd_configurator_interface(interface)
             else:
-                if not interface in result:
+                if interface not in result:
                     warn_confd_sshd_configurator_interface(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator_interface(interface)
