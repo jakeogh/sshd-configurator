@@ -2,12 +2,12 @@
 
 import os
 import sys
-import logging
+#import logging
 import netifaces
 import atexit
 import signal
 from time import sleep
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 '''
     Parse sshd_config and make sure sshd is configured to start on the
@@ -26,25 +26,25 @@ def write_unique_line_to_file(line, file_to_write):
             fh.write(line)
 
 
-def warn_confd_sshd():
-    logging.error("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
-    logging.error("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+def warn_confd_sshd(logger):
+    logger.error("\nERROR: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
+    logger.error("ERROR: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
     quit(1)
 
 
-def warn_confd_sshd_configurator(interface):
-    logging.error("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
-    logging.error("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+def warn_confd_sshd_configurator(logger, interface):
+    logger.error("\nERROR: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
+    logger.error("ERROR: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
     quit(1)
 
 
-def warn_confd_sshd_configurator_interface(interface):
-    logging.error("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
-    logging.error("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+def warn_confd_sshd_configurator_interface(logger, interface):
+    logger.error("\nERROR: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
+    logger.error("ERROR: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
     quit(1)
 
 
-def sshd_configurator_daemon(interface, daemon, sshd_config):
+def sshd_configurator_daemon(interface, daemon, sshd_config, logger):
     assert interface in netifaces.interfaces()
     assert os.path.getsize(sshd_config) != 0
     listen_address = netifaces.ifaddresses(interface)[2][0]['addr']
@@ -59,12 +59,12 @@ def sshd_configurator_daemon(interface, daemon, sshd_config):
             try:
                 result = [s for s in fhr if s.startswith('rc_need=')][-1]
             except IndexError:
-                warn_confd_sshd()
+                warn_confd_sshd(logger=logger)
             else:
                 if 'sshd-configurator' not in result:
-                    warn_confd_sshd()
+                    warn_confd_sshd(logger=logger)
     except FileNotFoundError:
-        warn_confd_sshd()
+        warn_confd_sshd(logger=logger)
 
     listen_service = "net." + interface
     try:
@@ -74,12 +74,12 @@ def sshd_configurator_daemon(interface, daemon, sshd_config):
             try:
                 result = [s for s in fhr if s.startswith('rc_need=')][-1]
             except IndexError:
-                warn_confd_sshd_configurator(interface)
+                warn_confd_sshd_configurator(interface=interface, logger=logger)
             else:
                 if listen_service not in result:
-                    warn_confd_sshd_configurator(interface)
+                    warn_confd_sshd_configurator(interface=interface, logger=logger)
     except FileNotFoundError:
-        warn_confd_sshd_configurator(interface)
+        warn_confd_sshd_configurator(interface=interface, logger=logger)
 
     try:
         with open('/etc/conf.d/sshd-configurator', 'r') as fh:
@@ -88,18 +88,18 @@ def sshd_configurator_daemon(interface, daemon, sshd_config):
             try:
                 result = [s for s in fhr if s.startswith("SSHD_INTERFACE=")][-1]
             except IndexError:
-                warn_confd_sshd_configurator_interface(interface)
+                warn_confd_sshd_configurator_interface(interface=interface, logger=logger)
             else:
                 if interface not in result:
-                    warn_confd_sshd_configurator_interface(interface)
+                    warn_confd_sshd_configurator_interface(interface=interface, logger=logger)
     except FileNotFoundError:
-        warn_confd_sshd_configurator_interface(interface)
+        warn_confd_sshd_configurator_interface(interface=interface, logger=logger)
 
     try:
         write_unique_line_to_file(line=ssh_rule, file_to_write=sshd_config)
     except PermissionError:
-        logging.error("ERROR: Unable to write to", sshd_config, file=sys.stderr)
-        logging.error("ERROR: Run \"chattr -i " + sshd_config + "\"", file=sys.stderr)
+        logger.error("ERROR: Unable to write to", sshd_config, file=sys.stderr)
+        logger.error("ERROR: Run \"chattr -i " + sshd_config + "\"", file=sys.stderr)
         quit(1)
 
     def un_mute(*args):

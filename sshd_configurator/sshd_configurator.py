@@ -9,6 +9,7 @@ from .sshd_configurator_daemon import sshd_configurator_daemon
 global pidfile
 pidfile = "/run/sshd-configurator.pid"
 
+global logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.propagate = False
@@ -36,9 +37,11 @@ class SSHD_CONFIGURATOR():
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator(interface, daemon, sshd_config):
     global keep_fds
+    global pidfile
+    global logger
     foreground = not daemon
     print("foreground:", foreground)
-    sshd_configurator_obj = SSHD_CONFIGURATOR(interface=interface, daemon=daemon, sshd_config=sshd_config)
+    sshd_configurator_obj = SSHD_CONFIGURATOR(interface=interface, daemon=daemon, sshd_config=sshd_config, logger=logger)
     daemon = Daemonize(app="ssh_configurator", pid=pidfile, action=sshd_configurator_obj.run, foreground=foreground, keep_fds=keep_fds)
     daemon.start()
 
