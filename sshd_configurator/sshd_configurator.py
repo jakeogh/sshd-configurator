@@ -99,6 +99,7 @@ def sshd_configurator(interface, sshd_config):
         warn_confd_sshd_configurator_interface(interface)
 
     if os.geteuid() == 0:
+        if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
         command = "chattr +i " + sshd_config
         os.system(command)
         atexit.register(un_mute)
