@@ -15,6 +15,7 @@ class SSHD_CONFIGURATOR():
     sshd_config: str
 
     def run(self):
+        print("run")
         sshd_configurator_daemon(interface=self.interface, daemon=self.daemon, sshd_config=self.sshd_config)
 
 
