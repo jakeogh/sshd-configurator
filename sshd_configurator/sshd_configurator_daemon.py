@@ -48,7 +48,7 @@ def warn_confd_sshd_configurator_interface(interface):
 @click.argument('interface', nargs=1)
 @click.option('--daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
-def sshd_configurator(interface, daemon, sshd_config):
+def sshd_configurator_daemon(interface, daemon, sshd_config):
     assert interface in netifaces.interfaces()
     assert os.path.getsize(sshd_config) != 0
     listen_address = netifaces.ifaddresses(interface)[2][0]['addr']
