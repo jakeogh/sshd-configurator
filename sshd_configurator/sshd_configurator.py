@@ -72,7 +72,7 @@ def sshd_configurator(interface, sshd_config):
             except IndexError:
                 warn_confd_sshd_configurator(interface)
             else:
-                if not listen_service result:
+                if not listen_service in result:
                     warn_confd_sshd_configurator(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator(interface)
@@ -86,7 +86,7 @@ def sshd_configurator(interface, sshd_config):
             except IndexError:
                 warn_confd_sshd_configurator_interface(interface)
             else:
-                if not interface in result):
+                if not interface in result:
                     warn_confd_sshd_configurator_interface(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator_interface(interface)
