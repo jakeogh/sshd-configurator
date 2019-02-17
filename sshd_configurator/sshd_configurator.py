@@ -25,10 +25,11 @@ class SSHD_CONFIGURATOR():
     interface: str
     daemon: bool
     sshd_config: str
+    logger: logging
 
     def run(self):
         print("run")
-        sshd_configurator_daemon(interface=self.interface, daemon=self.daemon, sshd_config=self.sshd_config)
+        sshd_configurator_daemon(interface=self.interface, daemon=self.daemon, sshd_config=self.sshd_config, logger=self.logger)
 
 
 @click.command()
