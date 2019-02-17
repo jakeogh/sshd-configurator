@@ -92,13 +92,13 @@ class SSHD_CONFIGURATOR():
 def sshd_configurator(interface, daemon, sshd_config):
     pidfile = "/run/sshd-configurator.pid"
     log = logging.getLogger(__name__)
-    run_checks(logger=log)
+    run_checks(interface=interface, logger=log)
     #logger.setLevel(logging.DEBUG)
     #logger.propagate = False
-    #fh = logging.StreamHandler()
-    #fh.setLevel(logging.DEBUG)
-    #logger.addHandler(fh)
-    #keep_fds = [fh.stream.fileno()]
+    lfh = logging.StreamHandler()
+    lfh.setLevel(logging.DEBUG)
+    log.addHandler(fh)
+    keep_fds = [lfh.stream.fileno()]
 
     foreground = not daemon
     print("foreground:", foreground)
