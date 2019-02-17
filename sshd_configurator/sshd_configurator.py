@@ -9,11 +9,12 @@ from .sshd_configurator_daemon import sshd_configurator_daemon
 @click.option('--daemon', 'be_daemon', is_flag=True)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
 def sshd_configurator(interface, be_daemon, sshd_config):
+    print("starting with be_daemon:", be_daemon)
     if be_daemon:
         with daemon.DaemonContext():
             sshd_configurator_daemon(interface=interface, daemon=be_daemon, sshd_config=sshd_config)
+            print("exiting")
     else:
-        print("starting with be_daemon:", be_daemon)
         sshd_configurator_daemon(interface=interface, daemon=be_daemon, sshd_config=sshd_config)
 
 
