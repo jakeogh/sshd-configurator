@@ -4,6 +4,10 @@ import os
 import click
 import netifaces
 
+'''
+    Parse sshd_config and make sure sshd is configured to start on the
+    interface specified in /etc/conf.d/sshd-configurator
+'''
 
 def write_unique_line_to_file(line, file_to_write):
     '''
