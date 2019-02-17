@@ -71,7 +71,6 @@ def run_checks(interface, logger):
         warn_confd_sshd_configurator_interface(interface=interface, logger=logger)
 
 
-
 @attr.s(auto_attribs=True)
 class SSHD_CONFIGURATOR():
     interface: str
