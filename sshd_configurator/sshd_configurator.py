@@ -65,7 +65,7 @@ def sshd_configurator(interface, daemon, sshd_config):
             except IndexError:
                 warn_confd_sshd()
             else:
-                if 'ssh-configurator' not in result:
+                if 'sshd-configurator' not in result:
                     warn_confd_sshd()
     except FileNotFoundError:
         warn_confd_sshd()
