@@ -24,7 +24,7 @@ def write_unique_line_to_file(line, file_to_write):
 
 def warn_confd_sshd():
     print("\nWARNING: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
-    print("WARNING: add rc_need=\"ssh-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+    print("WARNING: add rc_need=\"sshd-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
 
 
 def warn_confd_sshd_configurator(interface):
@@ -46,6 +46,7 @@ def sshd_configurator(interface, sshd_config):
     try:
         with open('/etc/conf.d/sshd', 'r') as fh:
             fhr = filter(lambda row: row[0] != '#', fh)
+            import IPython; IPython.embed()
             if 'sshd-configurator' not in fhr:
                 warn_confd_sshd()
     except FileNotFoundError:
