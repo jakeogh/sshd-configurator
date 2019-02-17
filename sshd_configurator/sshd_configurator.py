@@ -40,9 +40,6 @@ def warn_confd_sshd_configurator_interface(interface):
     print("\nWARNING: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
     print("WARNING: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
 
-def un_mute(sshd_config):
-    command = "chattr -i " + sshd_config
-    os.system(command)
 
 @click.command()
 @click.argument('interface', nargs=1)
@@ -104,14 +101,18 @@ def sshd_configurator(interface, sshd_config):
     except FileNotFoundError:
         warn_confd_sshd_configurator_interface(interface)
 
+    def un_mute(*args):
+        command = "chattr -i " + sshd_config
+        os.system(command)
+
     if os.geteuid() == 0:
         if not bool(getattr(sys, 'ps1', sys.flags.interactive)):
             print("not an interactve session")
             command = "chattr +i " + sshd_config
             os.system(command)
-            atexit.register(un_mute, sshd_config)
-            signal.signal(signal.SIGTERM, un_mute, sshd_config)
-            signal.signal(signal.SIGHUP, un_mute, sshd_config)
+            atexit.register(un_mute)
+            signal.signal(signal.SIGTERM, un_mute)
+            signal.signal(signal.SIGHUP, un_mute)
 
             while True:
                 sleep(1000000)
