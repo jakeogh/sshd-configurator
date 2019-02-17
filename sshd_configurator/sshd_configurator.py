@@ -23,12 +23,12 @@ def write_unique_line_to_file(line, file_to_write):
 
 
 def warn_confd_sshd():
-    print("WARNING: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
+    print("\nWARNING: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
     print("WARNING: add rc_need=\"ssh-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
 
 
 def warn_confd_sshd_configurator(interface):
-    print("WARNING: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
+    print("\nWARNING: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
     print("WARNING: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
 
 
