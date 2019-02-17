@@ -55,12 +55,6 @@ def sshd_configurator(interface, daemon, sshd_config):
     assert listen_address
     ssh_rule = 'ListenAddress ' + listen_address + ':22\n'
     ssh_rule = ssh_rule.encode('utf8')
-    try:
-        write_unique_line_to_file(line=ssh_rule, file_to_write=sshd_config)
-    except PermissionError:
-        print("ERROR: Unable to write to", sshd_config, file=sys.stderr)
-        print("ERROR: Run \"chattr -i " + sshd_config + "\"", file=sys.stderr)
-        quit(1)
 
     try:
         with open('/etc/conf.d/sshd', 'r') as fh:
@@ -104,6 +98,13 @@ def sshd_configurator(interface, daemon, sshd_config):
                     warn_confd_sshd_configurator_interface(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator_interface(interface)
+
+    try:
+        write_unique_line_to_file(line=ssh_rule, file_to_write=sshd_config)
+    except PermissionError:
+        print("ERROR: Unable to write to", sshd_config, file=sys.stderr)
+        print("ERROR: Run \"chattr -i " + sshd_config + "\"", file=sys.stderr)
+        quit(1)
 
     def un_mute(*args):
         command = "chattr -i " + sshd_config
