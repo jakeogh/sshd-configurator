@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import click
 import netifaces
 
@@ -21,6 +22,16 @@ def write_unique_line_to_file(line, file_to_write):
             fh.write(line)
 
 
+def warn_confd_sshd():
+    print("WARNING: /etc/conf.d/sshd is not configured to depend on sshd-configurator", file=sys.stderr)
+    print("WARNING: add rc_need=\"ssh-configurator\" to /etc/conf.d/sshd", file=sys.stderr)
+
+
+def warn_confd_sshd_configurator(interface):
+    print("WARNING: /etc/conf.d/sshd-configurator is not configured to depend on", interface, file=sys.stderr)
+    print("WARNING: add rc_need=\"net." + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
+
+
 @click.command()
 @click.argument('interface', nargs=1)
 @click.option('--sshd-config', is_flag=False, default='/etc/ssh/sshd_config')
@@ -32,6 +43,22 @@ def sshd_configurator(interface, sshd_config):
     ssh_rule = 'ListenAddress ' + listen_address + ':22\n'
     ssh_rule = ssh_rule.encode('utf8')
     write_unique_line_to_file(line=ssh_rule, file_to_write=sshd_config)
+    try:
+        with open('/etc/conf.d/sshd', 'r') as fh:
+            fhr = filter(lambda row: row[0] != '#', fh)
+            if 'sshd-configurator' not in fhr:
+                warn_confd_sshd()
+    except FileNotFoundError:
+        warn_confd_sshd()
+
+    listen_service = "net." + interface
+    try:
+        with open('/etc/conf.d/sshd-configurator', 'r') as fh:
+            fhr = filter(lambda row: row[0] != '#', fh)
+            if listen_service not in fhr:
+                warn_confd_sshd_configurator(interface)
+    except FileNotFoundError:
+        warn_confd_sshd_configurator(interface)
 
 
 if __name__ == '__main__':
