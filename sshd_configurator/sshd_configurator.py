@@ -4,6 +4,10 @@ import os
 import sys
 import click
 import netifaces
+import atexit
+import signal
+from time import sleep
+from stat import UF_IMMUTABLE
 
 '''
     Parse sshd_config and make sure sshd is configured to start on the
@@ -36,6 +40,9 @@ def warn_confd_sshd_configurator_interface(interface):
     print("\nWARNING: SSHD_INTERFACE is not set in /etc/conf.d/sshd-configurator.", file=sys.stderr)
     print("WARNING: add SSHD_INTERFACE=\"" + interface + "\" to /etc/conf.d/sshd-configurator", file=sys.stderr)
 
+def un_mute(sshd_config):
+    command = "chattr -i " + sshd_config
+    os.system(command)
 
 @click.command()
 @click.argument('interface', nargs=1)
@@ -90,6 +97,16 @@ def sshd_configurator(interface, sshd_config):
                     warn_confd_sshd_configurator_interface(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator_interface(interface)
+
+    command = "chattr +i " + sshd_config
+    os.system(command)
+    atexit.register(un_mute)
+    signal.signal(signal.SIGTERM, un_mute)
+    signal.signal(signal.SIGHUP, un_mute)
+
+    while True:
+        sleep(1000000)
+
 
 if __name__ == '__main__':
     sshd_configurator()
