@@ -45,7 +45,9 @@ def sshd_configurator(interface, sshd_config):
     write_unique_line_to_file(line=ssh_rule, file_to_write=sshd_config)
     try:
         with open('/etc/conf.d/sshd', 'r') as fh:
-            fhr = filter(lambda row: row[0] != '#', fh)
+            fhr = filter(None, (line.rstrip() for line in fh))
+            #fhr = filter(lambda row.strip(), fh)
+            fhr = filter(lambda row: row[0] != '#', fhr)
             import IPython; IPython.embed()
             if 'sshd-configurator' not in fhr:
                 warn_confd_sshd()
