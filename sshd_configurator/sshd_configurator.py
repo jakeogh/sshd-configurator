@@ -68,11 +68,11 @@ def sshd_configurator(interface, sshd_config):
             fhr = filter(None, (line.strip() for line in fh))
             fhr = filter(lambda row: row[0] != '#', fhr)
             try:
-                result = [s for s in fhr if listen_service in s][-1]
+                result = [s for s in fhr if 'rc_need=' in s][-1]
             except IndexError:
                 warn_confd_sshd_configurator(interface)
             else:
-                if not result.startswith("rc_need="):
+                if not listen_service result:
                     warn_confd_sshd_configurator(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator(interface)
@@ -82,13 +82,11 @@ def sshd_configurator(interface, sshd_config):
             fhr = filter(None, (line.strip() for line in fh))
             fhr = filter(lambda row: row[0] != '#', fhr)
             try:
-                result = [s for s in fhr if interface in s][-1]
+                result = [s for s in fhr if "SSHD_INTERFACE=" in s][-1]
             except IndexError:
                 warn_confd_sshd_configurator_interface(interface)
             else:
-                print("result:", result)
-                if not result.startswith("SSHD_INTERFACE="):
-                    print("here")
+                if not interface in result):
                     warn_confd_sshd_configurator_interface(interface)
     except FileNotFoundError:
         warn_confd_sshd_configurator_interface(interface)
