@@ -36,9 +36,25 @@ def sshd_configurator_daemon(
     ssh_rule = ssh_rule.encode("utf8")
 
     try:
-        write_line_to_file(line=ssh_rule, path=sshd_config, verbose=verbose)
+        write_line_to_file(
+            line=ssh_rule, path=sshd_config, unique=True, verbose=verbose
+        )
     except PermissionError:
-        logger.error(f"ERROR: Unable to write to {sshd_config.as_posix()}")
+        logger.error(
+            f"ERROR: Unable to write {repr(ssh_rule)} to {sshd_config.as_posix()}"
+        )
+        logger.error(f'ERROR: Run "chattr -i {sshd_config.as_posix()} "')
+        sys.exit(1)
+
+    ssh_rule = "UsePAM no\n".encode("utf8")
+    try:
+        write_line_to_file(
+            line=ssh_rule, path=sshd_config, unique=True, verbose=verbose
+        )
+    except PermissionError:
+        logger.error(
+            f"ERROR: Unable to write {repr(ssh_rule)} to {sshd_config.as_posix()}"
+        )
         logger.error(f'ERROR: Run "chattr -i {sshd_config.as_posix()} "')
         sys.exit(1)
 
