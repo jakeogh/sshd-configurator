@@ -121,6 +121,7 @@ def sshd_configurator(
     daemon: bool,
     sshd_config_file: str,
     verbose: Union[bool, int, float],
+    dict_input: bool,
 ):
     pidfile = "/run/sshd-configurator.pid"
     log = logging.getLogger(__name__)
