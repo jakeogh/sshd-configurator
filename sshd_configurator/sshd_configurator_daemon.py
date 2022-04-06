@@ -11,6 +11,7 @@ from typing import Union
 
 import netifaces
 from eprint import eprint
+from pathtool import comment_out_line_in_file
 from pathtool import write_line_to_file
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -45,6 +46,8 @@ def sshd_configurator_daemon(
         )
         logger.error(f'ERROR: Run "chattr -i {sshd_config.as_posix()} "')
         sys.exit(1)
+
+    comment_out_line_in_file(line="UsePAM yes", path=sshd_config, verbose=verbose)
 
     ssh_rule = "UsePAM no\n".encode("utf8")
     try:
