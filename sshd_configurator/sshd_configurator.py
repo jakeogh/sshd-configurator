@@ -121,6 +121,7 @@ def sshd_configurator(
     daemon: bool,
     sshd_config_file: str,
     verbose: Union[bool, int, float],
+    verbose_inf: bool,
     dict_input: bool,
 ):
     pidfile = "/run/sshd-configurator.pid"
