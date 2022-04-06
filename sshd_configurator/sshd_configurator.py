@@ -3,9 +3,13 @@
 
 import logging
 import sys
+from pathlib import Path
+from typing import Union
 
 import attr
 import click
+from clicktool import click_add_options
+from clicktool import click_global_options
 from daemonize import Daemonize
 
 from .sshd_configurator_daemon import sshd_configurator_daemon
@@ -91,8 +95,9 @@ def run_checks(interface, logger):
 class SSHD_CONFIGURATOR:
     interface: str
     daemon: bool
-    sshd_config: str
+    sshd_config: Path
     logger: logging.Logger
+    verbose: Union[bool, int, float]
 
     def run(self):
         print("run")
@@ -102,14 +107,21 @@ class SSHD_CONFIGURATOR:
             daemon=self.daemon,
             sshd_config=self.sshd_config,
             logger=self.logger,
+            verbose=self.verbose,
         )
 
 
 @click.command()
 @click.argument("interface", nargs=1)
 @click.option("--daemon", is_flag=True)
-@click.option("--sshd-config-file", is_flag=False, default="/etc/ssh/sshd_config")
-def sshd_configurator(interface, daemon, sshd_config_file):
+@click.option("--sshd-config-file", default="/etc/ssh/sshd_config")
+@click_add_options(click_global_options)
+def sshd_configurator(
+    interface: str,
+    daemon: bool,
+    sshd_config_file: str,
+    verbose: Union[bool, int, float],
+):
     pidfile = "/run/sshd-configurator.pid"
     log = logging.getLogger(__name__)
     run_checks(interface=interface, logger=log)
@@ -122,7 +134,11 @@ def sshd_configurator(interface, daemon, sshd_config_file):
 
     foreground = not daemon
     sshd_configurator_obj = SSHD_CONFIGURATOR(
-        interface=interface, daemon=daemon, sshd_config=sshd_config_file, logger=log
+        interface=interface,
+        daemon=daemon,
+        sshd_config=Path(sshd_config_file),
+        logger=log,
+        verbose=verbose,
     )
     daemon = Daemonize(
         app="ssh_configurator",
@@ -135,4 +151,5 @@ def sshd_configurator(interface, daemon, sshd_config_file):
 
 
 if __name__ == "__main__":
-    sshd_configurator()
+    # pylint: disable=E1120
+    sshd_configurator()  # type: ignore
