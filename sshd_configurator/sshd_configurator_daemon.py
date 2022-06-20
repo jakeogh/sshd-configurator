@@ -22,6 +22,21 @@ from pathtool import write_line_to_file
 """
 
 
+def write_sshd_rule(
+    *,
+    rule: bytes,
+    sshd_config: Path,
+    logger: logging.Logger,
+    verbose: Union[bool, int, float],
+):
+    try:
+        write_line_to_file(line=rule, path=sshd_config, unique=True, verbose=verbose)
+    except PermissionError:
+        logger.error(f"ERROR: Unable to write {repr(rule)} to {sshd_config.as_posix()}")
+        logger.error(f'ERROR: Run "chattr -i {sshd_config.as_posix()} "')
+        sys.exit(1)
+
+
 def sshd_configurator_daemon(
     interface: str,
     daemon: bool,
@@ -33,33 +48,24 @@ def sshd_configurator_daemon(
     assert os.path.getsize(sshd_config) != 0
     listen_address = netifaces.ifaddresses(interface)[2][0]["addr"]
     assert listen_address
-    ssh_rule = "ListenAddress " + listen_address + ":22\n"
-    ssh_rule = ssh_rule.encode("utf8")
-
-    try:
-        write_line_to_file(
-            line=ssh_rule, path=sshd_config, unique=True, verbose=verbose
-        )
-    except PermissionError:
-        logger.error(
-            f"ERROR: Unable to write {repr(ssh_rule)} to {sshd_config.as_posix()}"
-        )
-        logger.error(f'ERROR: Run "chattr -i {sshd_config.as_posix()} "')
-        sys.exit(1)
-
+    sshd_rule = "ListenAddress " + listen_address + ":22\n"
+    sshd_rule = sshd_rule.encode("utf8")
+    write_sshd_rule(
+        rule=sshd_rule, sshd_config=sshd_config, logger=logger, verbose=verbose
+    )
     comment_out_line_in_file(line="UsePAM yes", path=sshd_config, verbose=verbose)
+    sshd_rule = "UsePAM no\n".encode("utf8")
+    write_sshd_rule(
+        rule=sshd_rule, sshd_config=sshd_config, logger=logger, verbose=verbose
+    )
 
-    ssh_rule = "UsePAM no\n".encode("utf8")
-    try:
-        write_line_to_file(
-            line=ssh_rule, path=sshd_config, unique=True, verbose=verbose
-        )
-    except PermissionError:
-        logger.error(
-            f"ERROR: Unable to write {repr(ssh_rule)} to {sshd_config.as_posix()}"
-        )
-        logger.error(f'ERROR: Run "chattr -i {sshd_config.as_posix()} "')
-        sys.exit(1)
+    sshd_rule = "PermitRootLogin no"
+    comment_out_line_in_file(line=sshd_rule, path=sshd_config, verbose=verbose)
+
+    sshd_rule = "PermitRootLogin yes\n".encode("utf8")
+    write_sshd_rule(
+        rule=sshd_rule, sshd_config=sshd_config, logger=logger, verbose=verbose
+    )
 
     # def un_mute(*args):
     #    command = "chattr -i " + sshd_config
