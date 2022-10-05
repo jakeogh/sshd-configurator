@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import logging
 import os
 import sys
 from pathlib import Path
-# import atexit
-# import signal
 from time import sleep
-from typing import Union
 
 import netifaces
 from eprint import eprint
 from pathtool import comment_out_line_in_file
 from pathtool import write_line_to_file
 
+# import atexit
+# import signal
 # logging.basicConfig(level=logging.DEBUG)
 
 """
@@ -27,7 +28,7 @@ def write_sshd_rule(
     rule: bytes,
     sshd_config: Path,
     logger: logging.Logger,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
 ):
     try:
         write_line_to_file(line=rule, path=sshd_config, unique=True, verbose=verbose)
@@ -42,7 +43,7 @@ def sshd_configurator_daemon(
     daemon: bool,
     sshd_config: Path,
     logger: logging.Logger,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
 ):
     assert interface in netifaces.interfaces()
     assert os.path.getsize(sshd_config) != 0

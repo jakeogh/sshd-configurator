@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-# pylint: disable=R0903  # too few public methods
+# pylint: disable=too-few-public-methods          # [R0903]
 
 import logging
 import sys
 from pathlib import Path
-from typing import Union
 
 import attr
 import click
@@ -97,7 +96,7 @@ class SSHD_CONFIGURATOR:
     daemon: bool
     sshd_config: Path
     logger: logging.Logger
-    verbose: Union[bool, int, float]
+    verbose: bool | int | float
 
     def run(self):
         print("run")
@@ -120,9 +119,9 @@ def sshd_configurator(
     interface: str,
     daemon: bool,
     sshd_config_file: str,
-    verbose: Union[bool, int, float],
+    verbose: bool | int | float,
     verbose_inf: bool,
-    dict_input: bool,
+    dict_output: bool,
 ):
     pidfile = "/run/sshd-configurator.pid"
     log = logging.getLogger(__name__)
