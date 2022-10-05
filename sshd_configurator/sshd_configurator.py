@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # pylint: disable=too-few-public-methods          # [R0903]
+from __future__ import annotations
 
 import logging
 import sys
